@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Chatterino/chatterino2/master/docs/plugin-info.schema.json",
+  "name": "Chatterino-Crossban",
+  "description": "An easy way to ban people from multiple channels",
+  "authors": ["nonamedotdev"],
+  "homepage": "https://github.com/Chatterino/Chatterino2",
+  "tags": ["test"],
+  "version": "0.0.0",
+  "license": "MIT",
+  "permissions": [
+     {
+       "type": "FilesystemRead"
+     },
+     {
+       "type": "FilesystemWrite"
+     }
+  ]
+}
