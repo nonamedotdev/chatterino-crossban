@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/Chatterino/chatterino2/master/docs/plugin-info.schema.json",
   "name": "Chatterino-Crossban",
-  "description": "An easy way to ban people from multiple channels",
+  "description": "An easy way to ban people from multiple channels. Add a whispers channel to see everything from once source",
   "authors": ["nonamedotdev"],
-  "homepage": "https://github.com/Chatterino/Chatterino2",
+  "homepage": "https://github.com/nonamedotdev/chatterino-crossban",
   "tags": ["test"],
   "version": "0.0.0",
   "license": "MIT",

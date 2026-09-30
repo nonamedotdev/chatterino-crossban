@@ -2,37 +2,59 @@
 c2.log(c2.LogLevel.Warning, "Crossban script active")
 c2.log(c2.LogLevel.Debug, "Please use /add {channel}")
 
-local acc = c2.current_account()
-print(acc:is_valid()) -- true unless user removed account
-if(!acc:is_valid()) then
-    c2.log(c2.LogLevel.Warning, "There is no account linked to your chatterino. Please add an account first and reload the plugin.")
-	os.exit(-1)
+Acc = c2.current_account()
+
+if (not Acc:is_valid()) then
+    c2.log(c2.LogLevel.Warning,
+        "There is no account linked to your chatterino. Please add an account first and reload the plugin.")
+    os.exit(-1)
+end
+
+-- Information channel
+-- tbd. choosing your own channel
+InformationCh = c2.Channel.by_name("/whispers")
+
+-- Load modded channels
+ModdedChannels = {}
+
+for lines in io.lines("channels.txt") do
+    ModdedChannels[lines] = lines
+end
+
+
+
+for k, v in pairs(ModdedChannels) do
+    InformationCh:add_system_message(v)
 end
 
 -- Manually add channels by /add {channel.name}
-function add_channel(args)
-    local argcount = args.words.lenght()
-    local chName = args.words[2]
+function add_channel(ctx)
+    local chName = ctx.words[2]
 
-    local newChannel = c2.Channel.by_name(args.words[2])
-    if(newChannel == nil) then
-        print("An error while adding channel.")
+    InformationCh:add_system_message(chName)
+    if(not c2.Channel.by_name(chName)) then
+        InformationCh:add_system_message("Channel " .. chName .. " could not be found.")
+        return
     end
 
-    if (newChannel:is_mod() and newChannel:is_valid()) then
-        local file = io.open("channels.txt", "a+")
-        for line in io.lines("channels.txt") do
-           if(chName == line) then
-                print("User already exists")
+    local newChannel = c2.Channel.by_name(chName)
 
-                file:close("channels.txt")
+    if (newChannel:is_mod()) then
+        if ModdedChannels[chName] ~= nil then
+            InformationCh:add_system_message("Channel " .. chName .. " already exists.")
             return
-           end
         end
+        local file = io.open("channels.txt", "w")
+        io.output(file)
+        table.insert(ModdedChannels, chName)
 
-        file:write(chName .. "\n")
-        file:close("channels.txt")
-        print("Channel ", newChannel:get_display_name(), " is succesfully added.")
+        for k, v in pairs(ModdedChannels) do
+            io.write(v .. "\n")
+
+            InformationCh:add_system_message("Channel " .. chName)
+        end
+        io.close(file)
+        InformationCh:add_system_message("Channel ", chName, " is succesfully added.")
     end
 
 end
@@ -44,13 +66,24 @@ c2.register_command("/add", add_channel)
 function crossban_person(args)
     local person = args.words[2]
 
-    for line in io.lines("channels.txt") do
-        local currentChannel = c2.Channel.by_name(line)
-        print(currentChannel)
+    for index, value in pairs(ModdedChannels) do
+        local currentChannel = c2.Channel.by_name(value)
         currentChannel:send_message("/ban " .. person, true)
-        print(person .. "is banned from" .. currentChannel:get_display_name())
+        InformationCh:add_system_message(person .. " is banned from " .. value)
     end
 end
-
-
 c2.register_command("/cross", crossban_person)
+
+--[[
+function remove_channel(args)
+    local channel = args.words[2]
+    local lineNumber = 0
+    for line in io.lines("channels.txt") do
+        lineNumber = lineNumber + 1
+        if (line == channel) then
+
+        end
+    end
+end
+c2.register_command("/remove", remove_channel)
+]]
